@@ -267,12 +267,19 @@ process kraken2 {
 
   script:
   sname = name
-  
+  if (params.type == 'single-end') {
 
-  """
-  kraken2 --db ${params.kraken2_db} --threads ${task.cpus} --use-names --report ${sname}.kraken2.report.txt --output ${sname}.kraken2.output.txt --gzip-compressed $fastqFile
-  bracken -d ${params.kraken2_db} -i ${sname}.kraken2.report.txt -o ${sname}.bracken.output.txt -w ${sname}.braken.outreport.txt 
-  """
+    """
+    kraken2 --db ${params.kraken2_db} --threads ${task.cpus} --use-names --report ${sname}.kraken2.report.txt --output ${sname}.kraken2.output.txt --gzip-compressed ${sname}.qc.fastq.gz
+    bracken -d ${params.kraken2_db} -i ${sname}.kraken2.report.txt -o ${sname}.bracken.output.txt -w ${sname}.braken.outreport.txt 
+    """
+  }
+  else{
+    """
+    kraken2 --db ${params.kraken2_db} --threads ${task.cpus} --use-names --report ${sname}.kraken2.report.txt --output ${sname}.kraken2.output.txt --paired --gzip-compressed ${sname}_R1.qc.fastq.gz ${sname}_R2.qc.fastq.gz
+    bracken -d ${params.kraken2_db} -i ${sname}.kraken2.report.txt -o ${sname}.bracken.output.txt -w ${sname}.braken.outreport.txt 
+    """
+  }
 
 }
 
